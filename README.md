@@ -11,6 +11,12 @@
 
 ## Installation
 
+**HACS**
+
+1. Make sure the [HACS](https://github.com/custom-components/hacs) component is installed and working.
+2. Add this github repository https://github.com/HazardDede/home-assistant-ferienapidotde as custom integration repository in HACS settings.
+3. Install the integration `ferienapidotde` and update home assistant configuration accordingly. You need to restart home assistant for the changes to take effect.
+
 **Manual**
 
 1. Copy the `ferienapidotde` folder into your `custom_components` folder that is located under the root of your `home assistant config`. If it does not exists you can create it (which probably means you never used a custom component before).
