@@ -1,5 +1,6 @@
 {
   "name": "ferienapidotde",
+  "country": "DE",
   "domains": [
       "binary_sensor"
   ],
