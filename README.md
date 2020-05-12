@@ -41,3 +41,15 @@ Not so much you can do here but for the sake of completness.
 ```
 
 A list of all valid abbreviations for the german federal states can be found here: [https://www.datenportal.bmbf.de/portal/de/G122.html](https://www.datenportal.bmbf.de/portal/de/G122.html)
+
+If you wantt to monitor multiple states you have to setup multiple sensors:
+
+```yaml
+binary_sensor:
+  - platform: ferienapidotde
+    name: Vacation (HH)
+    state_code: HH
+  - platform: ferienapidotde
+    name: Vacation (SH)
+    state_code: SH
+```
