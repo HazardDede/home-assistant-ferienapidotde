@@ -1,0 +1,7 @@
+{
+  "name": "ferienapidotde",
+  "domains": [
+      "binary_sensor"
+  ],
+  "iot_class": "Cloud Polling"
+}

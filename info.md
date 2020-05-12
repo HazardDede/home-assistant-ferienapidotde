@@ -1,5 +1,3 @@
-# ferien-api.de binary sensor
-
 [![GitHub Release][releases-shield]][releases]
 [![GitHub Activity][commits-shield]][commits]
 [![License][license-shield]](LICENSE)
@@ -9,18 +7,18 @@
 
 > Home assistant binary sensor component to indicate if today is a german vacational day or not
 
+{% if not installed %}
 ## Installation
 
-**Manual**
-
-1. Copy the `ferienapidotde` folder into your `custom_components` folder that is located under the root of your `home assistant config`. If it does not exists you can create it (which probably means you never used a custom component before).
-2. Throw down a minimal configuration
+1. Click install.
+1. Add `ferienapidotde` to your `configuration.yaml`
 
 ```yaml
 binary_sensor:
   - platform: ferienapidotde
     state_code: HH  # Federal state of Hamburg
 ```
+{% endif %}
 
 ## Configuration
 
