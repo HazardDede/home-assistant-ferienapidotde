@@ -5,7 +5,7 @@
 [![hacs][hacsbadge]](hacs)
 ![Project Maintenance][maintenance-shield]
 
-> Home assistant binary sensor component to indicate if today is a german vacational day or not
+Home assistant binary sensor component to indicate if today is a german vacational day or not
 
 {% if not installed %}
 ## Installation
