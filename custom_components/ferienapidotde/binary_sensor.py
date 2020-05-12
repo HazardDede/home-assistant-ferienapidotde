@@ -21,35 +21,50 @@ from homeassistant.util import Throttle
 _LOGGER = logging.getLogger(__name__)
 
 ALL_STATE_CODES = [
-    "BW", "BY", "BE", "BB", "HB", "HH", "HE", "MV", "NI", "NW", "RP", "SL",
-    "SN", "ST", "SH", "TH"
+    "BW",
+    "BY",
+    "BE",
+    "BB",
+    "HB",
+    "HH",
+    "HE",
+    "MV",
+    "NI",
+    "NW",
+    "RP",
+    "SL",
+    "SN",
+    "ST",
+    "SH",
+    "TH",
 ]
 
-ATTR_START = 'start'
-ATTR_END = 'end'
-ATTR_NEXT_START = 'next_start'
-ATTR_NEXT_END = 'next_end'
-ATTR_VACATION_NAME = 'vacation_name'
+ATTR_START = "start"
+ATTR_END = "end"
+ATTR_NEXT_START = "next_start"
+ATTR_NEXT_END = "next_end"
+ATTR_VACATION_NAME = "vacation_name"
 
-CONF_NAME_DEFAULT = 'Vacation Sensor'
-CONF_STATE = 'state_code'
+CONF_NAME_DEFAULT = "Vacation Sensor"
+CONF_STATE = "state_code"
 
-ICON_OFF_DEFAULT = 'mdi:calendar-remove'
-ICON_ON_DEFAULT = 'mdi:calendar-check'
+ICON_OFF_DEFAULT = "mdi:calendar-remove"
+ICON_ON_DEFAULT = "mdi:calendar-check"
 
 # Don't rush the api. Every 12h should suffice.
 MIN_TIME_BETWEEN_UPDATES = timedelta(hours=12)
 
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-    vol.Required(CONF_STATE): vol.In(ALL_STATE_CODES),
-    vol.Optional(CONF_NAME, default=CONF_NAME_DEFAULT): cv.string
-})
+PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
+    {
+        vol.Required(CONF_STATE): vol.In(ALL_STATE_CODES),
+        vol.Optional(CONF_NAME, default=CONF_NAME_DEFAULT): cv.string,
+    }
+)
 
 SCAN_INTERVAL = timedelta(minutes=1)
 
 
-async def async_setup_platform(hass, config, async_add_entities,
-                               discovery_info=None):
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Setups the ferienapidotde platform."""
     _, _ = hass, discovery_info  # Fake usage
     state_code = config.get(CONF_STATE)
@@ -60,6 +75,7 @@ async def async_setup_platform(hass, config, async_add_entities,
         await data_object.async_update()
     except Exception:
         import traceback
+
         _LOGGER.warning(traceback.format_exc())
         raise PlatformNotReady()
 
@@ -98,6 +114,7 @@ class VacationSensor(BinarySensorDevice):
     async def async_update(self):
         """Updates the state and state attributes."""
         import ferien
+
         await self.data_object.async_update()
         vacs = self.data_object.data
         cur = ferien.current_vacation(vacs=vacs)
@@ -109,17 +126,17 @@ class VacationSensor(BinarySensorDevice):
             else:
                 aligned_end = nextvac.end - timedelta(seconds=1)
                 self._state_attrs = {
-                    ATTR_NEXT_START: nextvac.start.strftime('%Y-%m-%d'),
-                    ATTR_NEXT_END: aligned_end.strftime('%Y-%m-%d'),
-                    ATTR_VACATION_NAME: nextvac.name
+                    ATTR_NEXT_START: nextvac.start.strftime("%Y-%m-%d"),
+                    ATTR_NEXT_END: aligned_end.strftime("%Y-%m-%d"),
+                    ATTR_VACATION_NAME: nextvac.name,
                 }
         else:
             self._state = True
             aligned_end = cur.end - timedelta(seconds=1)
             self._state_attrs = {
-                ATTR_START: cur.start.strftime('%Y-%m-%d'),
-                ATTR_END: aligned_end.strftime('%Y-%m-%d'),
-                ATTR_VACATION_NAME: cur.name
+                ATTR_START: cur.start.strftime("%Y-%m-%d"),
+                ATTR_END: aligned_end.strftime("%Y-%m-%d"),
+                ATTR_VACATION_NAME: cur.name,
             }
 
 
@@ -136,9 +153,9 @@ class VacationData:
         """Updates the publicly available data container."""
         try:
             import ferien
+
             self.data = await ferien.state_vacations_async(self.state_code)
         except Exception:  # pylint: disable=broad-except
             if self.data is None:
                 raise
-            _LOGGER.error("Failed to update the vacation data."
-                          "Re-using an old state")
+            _LOGGER.error("Failed to update the vacation data." "Re-using an old state")
