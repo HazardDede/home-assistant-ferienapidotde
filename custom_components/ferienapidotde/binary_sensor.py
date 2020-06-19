@@ -12,7 +12,7 @@ from datetime import timedelta
 import voluptuous as vol
 
 import homeassistant.helpers.config_validation as cv
-from homeassistant.components.binary_sensor import BinarySensorDevice
+from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 from homeassistant.const import CONF_NAME
 from homeassistant.exceptions import PlatformNotReady
@@ -64,7 +64,9 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 SCAN_INTERVAL = timedelta(minutes=1)
 
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+async def async_setup_platform(
+        hass, config, async_add_entities, discovery_info=None
+):
     """Setups the ferienapidotde platform."""
     _, _ = hass, discovery_info  # Fake usage
     state_code = config.get(CONF_STATE)
@@ -82,7 +84,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     async_add_entities([VacationSensor(name, data_object)], True)
 
 
-class VacationSensor(BinarySensorDevice):
+class VacationSensor(BinarySensorEntity):
     """Implementation of the vacation sensor."""
 
     def __init__(self, name, data_object):
@@ -158,4 +160,6 @@ class VacationData:
         except Exception:  # pylint: disable=broad-except
             if self.data is None:
                 raise
-            _LOGGER.error("Failed to update the vacation data." "Re-using an old state")
+            _LOGGER.error(
+                "Failed to update the vacation data. Re-using an old state"
+            )
