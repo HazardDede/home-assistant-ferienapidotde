@@ -1,0 +1,26 @@
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+logger:
+  default: warning
+  logs:
+    custom_components.ferienapidotde.binary_sensor: debug
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+
+binary_sensor:
+  - platform: ferienapidotde
+    name: Vacation (HH)
+    state_code: HH
+  - platform: ferienapidotde
+    name: Vacation (SH)
+    state_code: SH

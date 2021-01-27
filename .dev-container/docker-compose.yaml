@@ -1,0 +1,12 @@
+version: '3'
+services:
+  hass:
+    image: homeassistant/home-assistant:2021.1.5
+    ports:
+      - "8123:8123"
+    volumes:
+      - ../.hass:/config
+      - ../custom_components:/custom_components
+    environment:
+      - TZ=Europe/Berlin
+    container_name: "hass-ferienapidotde-dev"

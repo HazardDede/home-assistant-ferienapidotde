@@ -155,7 +155,7 @@ class VacationData:
         """Updates the publicly available data container."""
         try:
             import ferien
-
+            _LOGGER.debug("Retrieving data from ferien-api.de for %s", self.state_code)
             self.data = await ferien.state_vacations_async(self.state_code)
         except Exception:  # pylint: disable=broad-except
             if self.data is None:
