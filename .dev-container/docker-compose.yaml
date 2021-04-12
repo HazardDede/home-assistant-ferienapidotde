@@ -1,7 +1,7 @@
 version: '3'
 services:
   hass:
-    image: homeassistant/home-assistant:2021.1.5
+    image: homeassistant/home-assistant:2021.4.3
     ports:
       - "8123:8123"
     volumes:
