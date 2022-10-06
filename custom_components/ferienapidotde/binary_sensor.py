@@ -75,11 +75,11 @@ async def async_setup_platform(
     try:
         data_object = VacationData(state_code)
         await data_object.async_update()
-    except Exception:
+    except Exception as ex:
         import traceback
 
         _LOGGER.warning(traceback.format_exc())
-        raise PlatformNotReady()
+        raise PlatformNotReady() from ex
 
     async_add_entities([VacationSensor(name, data_object)], True)
 
@@ -110,6 +110,12 @@ class VacationSensor(BinarySensorEntity):
 
     @property
     def device_state_attributes(self):
+        """Returns the state attributes of this device. This is deprecated but
+        we keep it for backwards compatibility."""
+        return self._state_attrs
+
+    @property
+    def extra_state_attributes(self):
         """Returns the state attributes of this device."""
         return self._state_attrs
 
@@ -142,7 +148,7 @@ class VacationSensor(BinarySensorEntity):
             }
 
 
-class VacationData:
+class VacationData:  # pylint: disable=too-few-public-methods
     """Class for handling data retrieval."""
 
     def __init__(self, state_code):
@@ -155,7 +161,10 @@ class VacationData:
         """Updates the publicly available data container."""
         try:
             import ferien
-            _LOGGER.debug("Retrieving data from ferien-api.de for %s", self.state_code)
+            _LOGGER.debug(
+                "Retrieving data from ferien-api.de for %s",
+                self.state_code
+            )
             self.data = await ferien.state_vacations_async(self.state_code)
         except Exception:  # pylint: disable=broad-except
             if self.data is None:

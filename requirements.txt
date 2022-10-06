@@ -1,5 +1,5 @@
-homeassistant==2021.4.3
-ferien-api==0.3.6
+homeassistant==2022.10.0
+ferien-api==0.3.7
 
 invoke
 flake8
