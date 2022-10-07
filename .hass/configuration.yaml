@@ -24,3 +24,7 @@ binary_sensor:
   - platform: ferienapidotde
     name: Vacation (SH)
     state_code: SH
+  - platform: ferienapidotde
+    name: Vacation (HH) + 3 days
+    days_offset: 3
+    state_code: HH

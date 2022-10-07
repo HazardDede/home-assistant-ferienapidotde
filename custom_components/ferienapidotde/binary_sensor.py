@@ -7,7 +7,7 @@ https://github.com/HazardDede/home-assistant-ferienapidotde
 """
 
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import voluptuous as vol
 
@@ -45,8 +45,11 @@ ATTR_NEXT_START = "next_start"
 ATTR_NEXT_END = "next_end"
 ATTR_VACATION_NAME = "vacation_name"
 
-CONF_NAME_DEFAULT = "Vacation Sensor"
+CONF_DAYS_OFFSET = "days_offset"
 CONF_STATE = "state_code"
+
+DEFAULT_DAYS_OFFSET = 0
+DEFAULT_NAME = "Vacation Sensor"
 
 ICON_OFF_DEFAULT = "mdi:calendar-remove"
 ICON_ON_DEFAULT = "mdi:calendar-check"
@@ -56,8 +59,10 @@ MIN_TIME_BETWEEN_UPDATES = timedelta(hours=12)
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
+        vol.Optional(CONF_DAYS_OFFSET, default=DEFAULT_DAYS_OFFSET):
+            vol.Coerce(int),
         vol.Required(CONF_STATE): vol.In(ALL_STATE_CODES),
-        vol.Optional(CONF_NAME, default=CONF_NAME_DEFAULT): cv.string,
+        vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
     }
 )
 
@@ -69,6 +74,7 @@ async def async_setup_platform(
 ):
     """Setups the ferienapidotde platform."""
     _, _ = hass, discovery_info  # Fake usage
+    days_offset = config.get(CONF_DAYS_OFFSET)
     state_code = config.get(CONF_STATE)
     name = config.get(CONF_NAME)
 
@@ -81,14 +87,15 @@ async def async_setup_platform(
         _LOGGER.warning(traceback.format_exc())
         raise PlatformNotReady() from ex
 
-    async_add_entities([VacationSensor(name, data_object)], True)
+    async_add_entities([VacationSensor(name, days_offset, data_object)], True)
 
 
 class VacationSensor(BinarySensorEntity):
     """Implementation of the vacation sensor."""
 
-    def __init__(self, name, data_object):
+    def __init__(self, name, days_offset, data_object):
         self._name = name
+        self._days_offset = days_offset
         self.data_object = data_object
         self._state = None
         self._state_attrs = {}
@@ -125,10 +132,12 @@ class VacationSensor(BinarySensorEntity):
 
         await self.data_object.async_update()
         vacs = self.data_object.data
-        cur = ferien.current_vacation(vacs=vacs)
+        dt_offset = datetime.now() + timedelta(days=self._days_offset)
+
+        cur = ferien.current_vacation(vacs=vacs, dt=dt_offset)
         if cur is None:
             self._state = False
-            nextvac = ferien.next_vacation(vacs=vacs)
+            nextvac = ferien.next_vacation(vacs=vacs, dt=dt_offset)
             if nextvac is None:
                 self._state_attrs = {}
             else:
