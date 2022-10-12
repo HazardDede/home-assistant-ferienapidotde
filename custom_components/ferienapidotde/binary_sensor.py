@@ -7,7 +7,7 @@ https://github.com/HazardDede/home-assistant-ferienapidotde
 """
 
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import voluptuous as vol
 
@@ -44,9 +44,12 @@ ATTR_END = "end"
 ATTR_NEXT_START = "next_start"
 ATTR_NEXT_END = "next_end"
 ATTR_VACATION_NAME = "vacation_name"
+ATTR_DAYS_OFFSET = "days_offset"
+ATTR_DAY_FOR_CHECK = "day_for_check"
 
 CONF_NAME_DEFAULT = "Vacation Sensor"
 CONF_STATE = "state_code"
+CONF_DAYS_OFFSET = "days_offset"
 
 ICON_OFF_DEFAULT = "mdi:calendar-remove"
 ICON_ON_DEFAULT = "mdi:calendar-check"
@@ -58,6 +61,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
         vol.Required(CONF_STATE): vol.In(ALL_STATE_CODES),
         vol.Optional(CONF_NAME, default=CONF_NAME_DEFAULT): cv.string,
+        vol.Optional(CONF_DAYS_OFFSET, default=0): cv.positive_int
     }
 )
 
@@ -71,9 +75,10 @@ async def async_setup_platform(
     _, _ = hass, discovery_info  # Fake usage
     state_code = config.get(CONF_STATE)
     name = config.get(CONF_NAME)
+    days_offset = config.get(CONF_DAYS_OFFSET)
 
     try:
-        data_object = VacationData(state_code)
+        data_object = VacationData(state_code, days_offset)
         await data_object.async_update()
     except Exception as ex:
         import traceback
@@ -125,10 +130,12 @@ class VacationSensor(BinarySensorEntity):
 
         await self.data_object.async_update()
         vacs = self.data_object.data
-        cur = ferien.current_vacation(vacs=vacs)
+        days_offset = self.data_object.days_offset
+        day_for_check = datetime.now() + timedelta(days=days_offset)
+        cur = ferien.current_vacation(vacs=vacs,dt=day_for_check)
         if cur is None:
             self._state = False
-            nextvac = ferien.next_vacation(vacs=vacs)
+            nextvac = ferien.next_vacation(vacs=vacs,dt=day_for_check)
             if nextvac is None:
                 self._state_attrs = {}
             else:
@@ -137,6 +144,8 @@ class VacationSensor(BinarySensorEntity):
                     ATTR_NEXT_START: nextvac.start.strftime("%Y-%m-%d"),
                     ATTR_NEXT_END: aligned_end.strftime("%Y-%m-%d"),
                     ATTR_VACATION_NAME: nextvac.name,
+                    ATTR_DAYS_OFFSET: days_offset,
+                    ATTR_DAY_FOR_CHECK: day_for_check.strftime("%Y-%m-%d"),
                 }
         else:
             self._state = True
@@ -145,16 +154,19 @@ class VacationSensor(BinarySensorEntity):
                 ATTR_START: cur.start.strftime("%Y-%m-%d"),
                 ATTR_END: aligned_end.strftime("%Y-%m-%d"),
                 ATTR_VACATION_NAME: cur.name,
+                ATTR_DAYS_OFFSET: days_offset,
+                ATTR_DAY_FOR_CHECK: day_for_check.strftime("%Y-%m-%d"),
             }
 
 
 class VacationData:  # pylint: disable=too-few-public-methods
     """Class for handling data retrieval."""
 
-    def __init__(self, state_code):
+    def __init__(self, state_code, days_offset):
         """Initializer."""
         self.state_code = str(state_code)
         self.data = None
+        self.days_offset = days_offset
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def async_update(self):
