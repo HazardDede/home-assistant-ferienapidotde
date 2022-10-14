@@ -39,6 +39,7 @@ ALL_STATE_CODES = [
     "TH",
 ]
 
+ATTR_DAYS_OFFSET = "days_offset"
 ATTR_START = "start"
 ATTR_END = "end"
 ATTR_NEXT_START = "next_start"
@@ -141,19 +142,19 @@ class VacationSensor(BinarySensorEntity):
             if nextvac is None:
                 self._state_attrs = {}
             else:
-                aligned_end = nextvac.end - timedelta(seconds=1)
                 self._state_attrs = {
                     ATTR_NEXT_START: nextvac.start.strftime("%Y-%m-%d"),
-                    ATTR_NEXT_END: aligned_end.strftime("%Y-%m-%d"),
+                    ATTR_NEXT_END: nextvac.end.strftime("%Y-%m-%d"),
                     ATTR_VACATION_NAME: nextvac.name,
+                    ATTR_DAYS_OFFSET: self._days_offset
                 }
         else:
             self._state = True
-            aligned_end = cur.end - timedelta(seconds=1)
             self._state_attrs = {
                 ATTR_START: cur.start.strftime("%Y-%m-%d"),
-                ATTR_END: aligned_end.strftime("%Y-%m-%d"),
+                ATTR_END: cur.end.strftime("%Y-%m-%d"),
                 ATTR_VACATION_NAME: cur.name,
+                ATTR_DAYS_OFFSET: self._days_offset
             }
 
 
