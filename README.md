@@ -48,6 +48,7 @@ Not so much you can do here but for the sake of completness.
   - platform: ferienapidotde
     name: Vacation (HH)
     state_code: HH
+    days_offset: 1  # Offset = 1 -> Is there any vacation tomorrow? Can be negative as well!
 ```
 
 A list of all valid abbreviations for the german federal states can be found here: [https://www.datenportal.bmbf.de/portal/de/G122.html](https://www.datenportal.bmbf.de/portal/de/G122.html)
@@ -62,6 +63,10 @@ binary_sensor:
   - platform: ferienapidotde
     name: Vacation (SH)
     state_code: SH
+  - platform: ferienapidotde
+    name: Vacation (HH) + 3 days
+    days_offset: 3
+    state_code: HH
 ```
 
 <!---->
