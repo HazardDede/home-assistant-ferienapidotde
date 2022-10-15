@@ -5,5 +5,5 @@
   "dependencies": [],
   "codeowners": ["@HazardDede"],
   "requirements": ["ferien-api==0.3.7"],
-  "version": "0.2.4"
+  "version": "0.3.0"
 }
