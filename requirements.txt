@@ -1,4 +1,4 @@
-homeassistant==2022.10.0
+homeassistant==2023.12.3
 ferien-api==0.3.7
 
 invoke
